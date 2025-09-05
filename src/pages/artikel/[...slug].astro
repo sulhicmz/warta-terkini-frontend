@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPosts, getPostBySlug } from '../../services/wordpress';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map(post => ({
+    params: { slug: post.slug },
+  }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug);
+
+if (!post) {
+  return Astro.redirect('/404'); // Redirect ke halaman 404 jika artikel tidak ditemukan
+}
+
+const formattedDate = new Date(post.date).toLocaleDateString('id-ID', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+---
+
+<BaseLayout title={post.title}>
+  <article class="bg-white rounded-lg shadow-md p-8">
+    {post.featuredImage && (
+      <img src={post.featuredImage} alt={post.title} class="w-full h-80 object-cover rounded-lg mb-6" />
+    )}
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
+    <p class="text-gray-600 text-sm mb-4">
+      Oleh {post.author} pada {formattedDate}
+      {post.categories.length > 0 && (
+        <> dalam
+          {post.categories.map((category, index) => (
+            <span class="ml-1 inline-block bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">{category}</span>
+          ))}
+        </>
+      )}
+    </p>
+    <div class="prose lg:prose-lg max-w-none" set:html={post.content}>
+    </div>
+    <div class="mt-8">
+        <a href="/" class="text-blue-600 hover:underline">&larr; Kembali ke Beranda</a>
+    </div>
+  </article>
+</BaseLayout>
