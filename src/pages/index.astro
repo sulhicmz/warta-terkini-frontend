@@ -1,10 +1,28 @@
 ---
-import Layout from '../layouts/Layout.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleCard from '../components/ArticleCard.astro';
+import { getPosts } from '../services/wordpress';
+
+const posts = await getPosts();
 ---
 
-<Layout title="Warta Terkini - Situs Berita Modern">
-	<main class="container mx-auto p-4">
-		<h1 class="text-4xl font-bold text-center text-gray-900 dark:text-white mb-8">Selamat Datang di Warta Terkini</h1>
-		<p class="text-lg text-center text-gray-700 dark:text-gray-300">Ini adalah frontend modern untuk situs berita WordPress Anda. Tetap ikuti perkembangannya!</p>
-	</main>
-</Layout>
+<BaseLayout title="Warta Terkini - Beranda">
+  <section class="py-8">
+    <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">Berita Terbaru</h1>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {posts.map((post) => (
+        <ArticleCard
+          title={post.title}
+          excerpt={post.excerpt}
+          date={post.date}
+          author={post.author}
+          slug={post.slug}
+          featuredImage={post.featuredImage}
+        />
+      ))}
+    </div>
+    {posts.length === 0 && (
+      <p class="text-center text-gray-600 text-lg">Tidak ada artikel yang ditemukan saat ini.</p>
+    )}
+  </section>
+</BaseLayout>
