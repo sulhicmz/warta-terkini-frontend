@@ -1,0 +1,43 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="flex flex-col min-h-screen bg-gray-100 font-sans antialiased">
+    <header class="bg-white shadow-md py-4">
+      <div class="container mx-auto px-4 flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold text-gray-800">Warta Terkini</a>
+        <nav>
+          <ul class="flex space-x-4">
+            <li><a href="/" class="text-gray-600 hover:text-blue-600">Beranda</a></li>
+            <!-- Tambahkan item navigasi lain di sini jika diperlukan -->
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+      <slot />
+    </main>
+
+    <footer class="bg-gray-800 text-white py-6 mt-auto">
+      <div class="container mx-auto px-4 text-center">
+        <p>&copy; {new Date().getFullYear()} Warta Terkini. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
