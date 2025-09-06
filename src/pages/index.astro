@@ -1,28 +1,32 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ArticleCard from '../components/ArticleCard.astro';
-import { getPosts } from '../services/wordpress';
+import Layout from '../layouts/Layout.astro';
+import Card from '../components/Card.astro';
+import { getPosts } from '../lib/wordpress'; // Import fungsi getPosts
 
-const posts = await getPosts();
+const posts = await getPosts(5); // Ambil 5 postingan terbaru
+
+// Log postingan untuk debugging
+console.log(posts);
 ---
 
-<BaseLayout title="Warta Terkini - Beranda">
-  <section class="py-8">
-    <h1 class="text-4xl font-bold text-gray-900 mb-8 text-center">Berita Terbaru</h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-      {posts.map((post) => (
-        <ArticleCard
-          title={post.title}
-          excerpt={post.excerpt}
-          date={post.date}
-          author={post.author}
-          slug={post.slug}
-          featuredImage={post.featuredImage}
-        />
-      ))}
-    </div>
-    {posts.length === 0 && (
-      <p class="text-center text-gray-600 text-lg">Tidak ada artikel yang ditemukan saat ini.</p>
-    )}
-  </section>
-</BaseLayout>
+<Layout title="Warta Terkini - Berita Terbaru">
+    <main class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center text-gray-900 dark:text-white mb-8">Berita Terbaru</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {posts.map((post) => (
+                <Card
+                    title={post.title.rendered}
+                    body={post.excerpt.rendered.replace(/<\/?p>/g, '')} // Hapus tag <p>
+                    href={`/artikel/${post.slug}`} // Contoh link ke halaman artikel
+                    imgSrc={post._embedded['wp:featuredmedia']?.[0]?.source_url || '/placeholder.jpg'} // Gambar unggulan
+                    imgAlt={post._embedded['wp:featuredmedia']?.[0]?.alt_text || post.title.rendered}
+                />
+            ))}
+        </div>
+    </main>
+</Layout>
+
+<style>
+    /* Styling tambahan bisa ditambahkan di sini jika diperlukan */
+</style>
