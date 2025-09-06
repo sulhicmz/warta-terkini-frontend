@@ -1,0 +1,39 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getPostBySlug, getPosts } from '../../lib/wordpress';
+
+export async function getStaticPaths() {
+    const posts = await getPosts(100); // Ambil lebih banyak postingan untuk pre-rendering
+
+    return posts.map(post => ({
+        params: { slug: post.slug },
+    }));
+}
+
+const { slug } = Astro.params;
+const post = await getPostBySlug(slug);
+
+if (!post) {
+    return Astro.redirect('/404'); // Redirect ke halaman 404 jika postingan tidak ditemukan
+}
+---
+
+<Layout title={post.title.rendered}>
+    <main class="container mx-auto px-4 py-8">
+        <article class="max-w-prose mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">{post.title.rendered}</h1>
+            <div class="text-gray-600 dark:text-gray-400 text-sm mb-6">
+                Dipublikasikan pada: {new Date(post.date).toLocaleDateString()}
+                {post._embedded.author?.[0]?.name && ` oleh ${post._embedded.author[0].name}`}
+            </div>
+            {post._embedded['wp:featuredmedia']?.[0]?.source_url && (
+                <img
+                    src={post._embedded['wp:featuredmedia'][0].source_url}
+                    alt={post._embedded['wp:featuredmedia'][0].alt_text || post.title.rendered}
+                    class="w-full h-auto rounded-lg mb-6"
+                />
+            )}
+            <div class="prose dark:prose-invert max-w-none" set:html={post.content.rendered}></div>
+        </article>
+    </main>
+</Layout>
